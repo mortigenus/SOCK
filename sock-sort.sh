@@ -27,7 +27,15 @@
 echo "pre-commit pysock script start"
 
 temp_file_name="sock_temp_file_which_will_be_deleted_automatically"
-script_name="pysock/sock.py"
+
+script_source="${BASH_SOURCE[0]}"
+while [ -h "$script_source" ]; do # resolve $script_source until the file is no longer a symlink
+    script_dir="$( cd -P "$( dirname "$script_source" )" && pwd )"
+    script_source="$(readlink "$script_source")"
+    [[ $script_source != /* ]] && script_source="$script_dir/$script_source" # if $script_source was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+script_dir="$( cd -P "$( dirname "$script_source" )" && pwd )"
+script_name="${script_dir}/pysock/sock.py"
 
 ######## Getting staged files paths and dumping to file
 git diff --name-only --cached >> $temp_file_name
@@ -56,3 +64,4 @@ done <"$file"
 rm $temp_file_name
 
 echo "pre-commit pysock script end"
+
